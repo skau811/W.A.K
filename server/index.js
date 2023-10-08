@@ -192,35 +192,89 @@ app.get("/friends/:myUsername", async (req, res) => {
 });
 
 // Route to get all the favorite movies of a user
+// app.get("/:myUsername/favorites", requireAuth, async (req, res) => {
+//     const myUsername = req.params.myUsername;
+//     try {
+//         const result = await User.findOne({ username: myUsername });
+//         res.json(result.favorites);
+//     } catch (error) {
+//         console.error("Error fetching users:", error);
+//         res.status(500).json({ error: error.message });
+//     }
+// });
+
+// Route to get all the favorite movies of a user
 app.get("/:myUsername/favorites", requireAuth, async (req, res) => {
     const myUsername = req.params.myUsername;
+
     try {
-        const result = await User.findOne({ username: myUsername });
-        res.json(result.favorites);
+        // 1. Fetch the user's favorites
+        const user = await User.findOne({ username: myUsername });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // 2. Fetch the user's ratings
+        const userRatings = await Rating.findOne({ username: myUsername });
+
+        // 3. Map over the favorites and enhance them with ratings
+        const ratedFavorites = user.favorites.map((fav) => {
+            let rating = 0; // default value
+
+            // Check if userRatings exists and find the rating for the movie
+            if (userRatings) {
+                const ratingObj = userRatings.movies.find(
+                    (m) => m.movieTitle === fav.movieTitle
+                );
+                if (ratingObj) {
+                    rating = ratingObj.rating;
+                }
+            }
+
+            return {
+                movieId: fav.movieId,
+                movieTitle: fav.movieTitle,
+                addedAt: fav.addedAt,
+                rating: rating,
+            };
+        });
+
+        // 4. Optionally sort the enhanced favorites based on provided criteria
+        switch (req.query.sortBy) {
+            case "rating":
+                ratedFavorites.sort((a, b) => b.rating - a.rating); // Sort by rating in descending order
+                break;
+            case "added":
+            default:
+                ratedFavorites.sort(
+                    (a, b) => new Date(b.addedAt) - new Date(a.addedAt)
+                ); // Sort by added date, newest first
+                break;
+        }
+
+        // 5. Send the enhanced favorites as the response
+        res.json(ratedFavorites);
     } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching user's favorite movies:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
 // Route to add a movie to the favorites list
-app.post(
-    "/:myUsername/favorites/add/:movieId",
-    requireAuth,
-    async (req, res) => {
-        const movieId = req.params.movieId;
-        const myUsername = req.params.myUsername;
+app.post("/:myUsername/favorites/add", requireAuth, async (req, res) => {
+    const movieId = req.body.movieId;
+    const movieTitle = req.body.movieTitle;
+    const myUsername = req.params.myUsername;
 
-        try {
-            const user = await User.findOne({ username: myUsername });
-            if (!user) return res.status(404).json({ error: "User not found" });
-            await user.addFavorite(movieId);
-            res.status(200).json({ message: "Movie added to favorites" });
-        } catch (error) {
-            res.status(400).json({ error: error.message });
-        }
+    try {
+        const user = await User.findOne({ username: myUsername });
+        if (!user) return res.status(404).json({ error: "User not found" });
+        await user.addFavorite(movieId, movieTitle);
+        res.status(200).json({ message: "Movie added to favorites" });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
-);
+});
 
 // Route to delete a movie from the favorites list
 app.delete(
@@ -241,7 +295,7 @@ app.delete(
     }
 );
 
-// Route to retrieve all favorite movies
+// Route to check if a movie is a favorite
 app.get(
     "/:myUsername/favorites/isFavorite/:movieId",
     requireAuth,
@@ -253,7 +307,9 @@ app.get(
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }
-            const isFavorite = user.favorites.includes(String(movieId));
+            const isFavorite = user.favorites.some(
+                (fav) => fav.movieId === String(movieId)
+            );
             res.status(200).json({ isFavorite });
         } catch (error) {
             console.error("Error fetching favorite movie:", error);
