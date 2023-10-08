@@ -28,9 +28,9 @@ export const computeThemeColourAndImage = async (
     const favJson = await favRes.json();
 
     // Use TMDB to grab the poster image
-    const movieDetailsPromises = favJson.map(async (favoriteMovie) => {
+    const movieDetailsPromises = favJson.map(async (movies) => {
         const detailsRes = await fetch(
-            `https://api.themoviedb.org/3/movie/${favoriteMovie.movieId}?api_key=${apiKey}&language=en-US`
+            `https://api.themoviedb.org/3/movie/${movies.movieId}?api_key=${apiKey}&language=en-US`
         );
         return await detailsRes.json();
     });
