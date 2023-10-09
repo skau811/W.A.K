@@ -51,10 +51,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
                 `${
                     import.meta.env.VITE_BASE_API_URL
                 }/${username}/favorites/add`,
-                { movieId, movieTitle },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
+                { movieId, movieTitle }
             );
             setIsFavorite(true);
         } catch (error) {

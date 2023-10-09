@@ -1,7 +1,48 @@
-.favourites-box {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  height: 100%;
-  background-color: black;
+favourites-box {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    height: 100%;
+    background-color: black;
+}
+.dropdown-container {
+    margin-bottom: 60px; /* Adds space between dropdown and grid */
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+.dropdown-label {
+    font-size: 1.2rem;
+    margin-right: 10px; /* Add some spacing between label and dropdown */
+    color: white; /* Assuming you want the label color to be white, adjust as needed */
+}
+
+.dropdown-select {
+    font-size: 18px; /* Increase font size of the dropdown */
+    padding: 5px 10px; /* Add padding around the dropdown itself */
+    border-radius: 5px; /* Optional: Round the edges of the dropdown */
+    background-color: #f5f5f5; /* Optional: Background color */
+    border: 1px solid #ddd; /* Optional: Border */
+}
+
+.dropdown-select option {
+    padding: 5px 20px; /* Add padding to each individual option */
+}
+.grid-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.rating-div {
+    margin: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.delete-btn-div {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }

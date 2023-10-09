@@ -204,7 +204,7 @@ app.get("/friends/:myUsername", async (req, res) => {
 // });
 
 // Route to get all the favorite movies of a user
-app.get("/:myUsername/favorites", requireAuth, async (req, res) => {
+app.get("/:myUsername/favorites", async (req, res) => {
     const myUsername = req.params.myUsername;
 
     try {
@@ -261,7 +261,7 @@ app.get("/:myUsername/favorites", requireAuth, async (req, res) => {
 });
 
 // Route to add a movie to the favorites list
-app.post("/:myUsername/favorites/add", requireAuth, async (req, res) => {
+app.post("/:myUsername/favorites/add", async (req, res) => {
     const movieId = req.body.movieId;
     const movieTitle = req.body.movieTitle;
     const myUsername = req.params.myUsername;
@@ -279,7 +279,7 @@ app.post("/:myUsername/favorites/add", requireAuth, async (req, res) => {
 // Route to delete a movie from the favorites list
 app.delete(
     "/:myUsername/favorites/remove/:movieId",
-    requireAuth,
+
     async (req, res) => {
         const movieId = req.params.movieId;
         const myUsername = req.params.myUsername;
@@ -298,7 +298,7 @@ app.delete(
 // Route to check if a movie is a favorite
 app.get(
     "/:myUsername/favorites/isFavorite/:movieId",
-    requireAuth,
+
     async (req, res) => {
         const myUsername = req.params.myUsername;
         const movieId = req.params.movieId;
